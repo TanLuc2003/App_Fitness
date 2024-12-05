@@ -5,6 +5,8 @@ pool:
   vmImage: 'windows-latest'
 
 steps:
+- checkout: self # Đảm bảo rằng mã nguồn được checkout
+
 - task: Gradle@2
   inputs:
     workingDirectory: ''
