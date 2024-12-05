@@ -1,20 +1,25 @@
 trigger:
-- main  # Tự động kích hoạt pipeline khi có thay đổi ở nhánh "main"
+- main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'macos-latest'
 
 steps:
-- task: UsePythonVersion@1
+- task: Gradle@2
   inputs:
-    versionSpec: '3.x'  # Đảm bảo môi trường có Python cho Flutter
+    workingDirectory: ''
+    gradleWrapperFile: 'gradlew'
+    gradleOptions: '-Xmx3072m'
+    publishJUnitResults: false
+    testResultsFiles: '**/TEST-*.xml'
+    tasks: 'assembleRelease'
 
-- task: UseFlutter@0
+- task: CopyFiles@2
   inputs:
-    channel: 'stable'
+    contents: '**/*.apk'
+    targetFolder: '$(Build.ArtifactStagingDirectory)'
 
-- script: |
-    flutter pub get
-    flutter test
-    flutter build apk --release
-  displayName: 'Build Flutter APK'
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'apk'
